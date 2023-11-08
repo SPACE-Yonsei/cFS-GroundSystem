@@ -18,6 +18,7 @@
 #  limitations under the License.
 #
 
+import os
 import csv
 import getopt
 import shlex
@@ -151,7 +152,7 @@ class TSTlmReceiver(QThread):
         # Init zeroMQ
         context = zmq.Context()
         self.subscriber = context.socket(zmq.SUB)
-        self.subscriber.connect("ipc:///tmp/GroundSystem")
+        self.subscriber.connect(f"ipc:///tmp/GroundSystem-{os.getenv('INSTANCE_KEY')}")
         self.subscriber.setsockopt_string(zmq.SUBSCRIBE, subscr)
 
     def run(self):

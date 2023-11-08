@@ -49,6 +49,7 @@
 # uint8   Spare1;       166
 # uint8   Spare2;       167
 
+import os
 import getopt
 import mmap
 import sys
@@ -77,7 +78,7 @@ class EventMessageTelemetry(QDialog, UiEventmessagedialog):
             4: "CRITICAL"
         }
 
-        with open("/tmp/OffsetData", "r+b") as f:
+        with open(f"/tmp/OffsetData-{os.getenv('INSTANCE_KEY')}", "r+b") as f:
             self.mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
 
     def init_em_tlm_receiver(self, subscr):
@@ -141,7 +142,7 @@ class EMTlmReceiver(QThread):
         # Init zeroMQ
         self.context = zmq.Context()
         self.subscriber = self.context.socket(zmq.SUB)
-        self.subscriber.connect("ipc:///tmp/GroundSystem")
+        self.subscriber.connect(f"ipc:///tmp/GroundSystem-{os.getenv('INSTANCE_KEY')}")
         subscription_string = f"{subscr}.Spacecraft1.TelemetryPackets.{app_id}"
         self.subscriber.setsockopt_string(zmq.SUBSCRIBE, subscription_string)
 

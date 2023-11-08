@@ -18,6 +18,7 @@
 #  limitations under the License.
 #
 
+import os
 import zmq
 
 
@@ -30,7 +31,7 @@ def main():
     # Prepare our context and publisher
     context = zmq.Context()
     subscriber = context.socket(zmq.SUB)
-    subscriber.connect("ipc:///tmp/GroundSystem")
+    subscriber.connect(f"ipc:///tmp/GroundSystem-{os.getenv('INSTANCE_KEY')}")
     subscriber.setsockopt(zmq.SUBSCRIBE, b"GroundSystem")
 
     while True:

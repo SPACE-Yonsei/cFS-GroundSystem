@@ -24,6 +24,7 @@ import sys
 import os
 import signal
 import pathlib
+import random
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
@@ -163,7 +164,7 @@ class GroundSystem(QMainWindow, UiMainWindow):
     def save_offsets(self):
         offsets = bytes((self.sb_tlm_offset.value(), self.sb_cmd_offset_pri.value(),
                          self.sb_cmd_offset_sec.value()))
-        with open("/tmp/OffsetData", "wb") as f:
+        with open(f"/tmp/OffsetData-{os.getenv('INSTANCE_KEY')}", "wb") as f:
             f.write(offsets)
 
     # Update the combo box list in gui
@@ -184,6 +185,8 @@ class GroundSystem(QMainWindow, UiMainWindow):
 
 #
 def main():
+    os.environ["INSTANCE_KEY"] = f"GroundSystem-{os.getpid()}-{random.randint(0, 1000)}"
+
     # Report Version Number upon startup
     print(_version_string)
 

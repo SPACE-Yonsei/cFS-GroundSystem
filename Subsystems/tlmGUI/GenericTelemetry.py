@@ -17,6 +17,7 @@
 #  limitations under the License.
 #
 
+import os
 import csv
 import getopt
 import mmap
@@ -42,7 +43,7 @@ class SubsystemTelemetry(QDialog, UiGenerictelemetrydialog):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        with open("/tmp/OffsetData", "r+b") as f:
+        with open(f"/tmp/OffsetData-{os.getenv('INSTANCE_KEY')}", "r+b") as f:
             self.mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
 
     #
@@ -131,7 +132,7 @@ class GTTlmReceiver(QThread):
         # Init zeroMQ
         context = zmq.Context()
         self.subscriber = context.socket(zmq.SUB)
-        self.subscriber.connect("ipc:///tmp/GroundSystem")
+        self.subscriber.connect(f"ipc:///tmp/GroundSystem-{os.getenv('INSTANCE_KEY')}")
         my_tlm_pg_apid = subscr.split(".", 1)
         my_subscription = f"GroundSystem.Spacecraft1.TelemetryPackets.{my_tlm_pg_apid[1]}"
         self.subscriber.setsockopt_string(zmq.SUBSCRIBE, my_subscription)

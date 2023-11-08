@@ -18,6 +18,7 @@
 #  limitations under the License.
 #
 
+import os
 import socket
 from struct import unpack
 from time import sleep
@@ -25,9 +26,21 @@ from time import sleep
 import zmq
 from PyQt5.QtCore import QThread, pyqtSignal
 
-# Receive port where the CFS TO_Lab app sends the telemetry packets
-udp_recv_port = 1235
 
+def init_udp_recv_port():
+    uid = os.getuid()
+
+    for i in range(10):
+        port = 1200 + (uid % 10) * 10 + i
+
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind(('', port))
+            sock.close()
+            
+            return port
+        except OSError:
+            continue
 
 #
 # Receive telemetry packets, apply the appropriate header
@@ -51,10 +64,12 @@ class RoutingService(QThread):
         # Init zeroMQ
         self.context = zmq.Context()
         self.publisher = self.context.socket(zmq.PUB)
-        self.publisher.bind("ipc:///tmp/GroundSystem")
+        self.publisher.bind(f"ipc:///tmp/GroundSystem-{os.getenv('INSTANCE_KEY')}")
 
     # Run thread
     def run(self):
+        udp_recv_port = init_udp_recv_port()
+
         # Init udp socket
         self.sock.bind(('', udp_recv_port))
 

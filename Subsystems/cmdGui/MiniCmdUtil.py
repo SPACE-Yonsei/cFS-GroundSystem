@@ -19,6 +19,7 @@
 ## This file is a Python implementation of a subset of functions in cmdUtil
 ## to support the GroundSystem GUI
 
+import os
 import mmap
 import socket
 from collections import namedtuple
@@ -61,7 +62,7 @@ class MiniCmdUtil:
         self.parameters = parameters
         self.payload = bytearray()
         self.packet = bytearray()
-        with open("/tmp/OffsetData", "r+b") as f:
+        with open(f"/tmp/OffsetData-{os.getenv('INSTANCE_KEY')}", "r+b") as f:
             self.mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
 
         self.cmd_offset_pri = 0
